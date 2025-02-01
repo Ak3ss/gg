@@ -131,7 +131,7 @@ game.Workspace.DescendantRemoving:Connect(function(Crate)
 end)
 
 RunService.RenderStepped:Connect(function()
-    for Crate, text in pairs(Crate) do
+    for Crate, text in pairs(CratesEsp) do
        	local character = Crate
         if character then
             local rootPart = character:FindFirstChild("Bottom") and character:FindFirstChild("Handles") and character:FindFirstChild("Top")
