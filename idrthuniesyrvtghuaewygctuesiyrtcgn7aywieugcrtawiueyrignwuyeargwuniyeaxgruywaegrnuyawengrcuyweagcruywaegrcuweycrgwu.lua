@@ -1,11 +1,11 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/oShyyyyy/Plaguecheat.cc-Roblox-Ui-library/main/Source.lua", true))()
-local RunService = game:GetService("RunService")
 local Aimbot = library:AddWindow('Aimbot')
 local Visual = library:AddWindow('Visual')
 local Misc = library:AddWindow('Misc')
 local Camera = game.Workspace.Camera
 local watermark = library:AddWatermark('');
 local esp = Visual:AddSection('Esp')
+local hitbox = Aimbot:AddSection('Hitbox')
 local smth = Misc:AddSection('Visuals')
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -19,7 +19,7 @@ local Nametag = false
 local Chams = false
 local Cratetags = false
 local ChamsFolder = Instance.new("Folder")
-ChamsFolder.Parent = game.TestService
+ChamsFolder.Parent = game.CoreGui
 ChamsFolder.Name = "ChamsFolder"
 
 local function createNametag(player)
@@ -142,7 +142,7 @@ RunService.RenderStepped:Connect(function()
                 local distance = (Camera.CFrame.Position - rootPart.Position).Magnitude
                 if onScreen then
                     text.Position = Vector2.new(screenPosition.X, screenPosition.Y)
-                    text.Text = "Green Crate [" .. distance2 .. "m]"
+                    text.Text = "Green Crate [" .. distance2 .. "studs]"
                     text.Size = math.clamp(30 - distance, 12, 20)
 					if Cratetags == true then
 						text.Visible = true
@@ -258,6 +258,44 @@ game.Workspace.DescendantRemoving:Connect(function(player)
 	end
 end)
 
+hitbox:AddLabel('Player Hitbox')
+
+local hitenabled = false
+local hitsize = 1.672
+local hittrans = 0
+
+hitbox:AddToggle('Enabled',true,nil,function(v) 
+	hitenabled = v
+end)
+
+hitbox:AddSlider('Head Size', 8, 1.672, 1.672,function(c) 
+	hitsize = c
+end)
+
+hitbox:AddSlider('Head Transparecy', 1, 0, 0,function(c) 
+	hittrans = c
+end)
+
+RunService.RenderStepped:Connect(function()
+    if hitenabled == true then
+        for _, v in pairs(workspace:GetChildren()) do
+            if v:FindFirstChild("Head") and v:FindFirstChild("HumanoidRootPart") then
+                v.Head.CanCollide = false
+                v.Head.Transparency = hittrans
+                v.Head.Size = Vector3.new(hitsize, hitsize, hitsize)
+            end
+        end
+    elseif hitenabled == false then
+        for _, v in pairs(workspace:GetChildren()) do
+            if v:FindFirstChild("Head") and v:FindFirstChild("HumanoidRootPart") then
+                v.Head.CanCollide = true
+                v.Head.Transparency = 0
+                v.Head.Size = Vector3.new(1.672, 0.836, 0.836)
+            end
+        end
+    end
+end)
+
 esp:AddLabel('Player Esp')
 
 esp:AddToggle('Nametags',true,nil,function(v) 
@@ -268,8 +306,33 @@ esp:AddToggle('Chams',true,nil,function(v)
 	Chams = v
 end)
 
+esp:AddToggle('Skeleton',true,nil,function(v) 
+	Skeleton = v
+end)
+
 esp:AddToggle('Green Crate',true,nil,function(v) 
 	Cratetags = v
+end)
+
+local FieldOfView = 70
+
+smth:AddToggle('No Grass',true,nil,function(v)
+	sethiddenproperty(game:GetService("Workspace").Terrain, "Decoration", not v)
+end)
+
+smth:AddSlider('FieldOfView | Default is 70', 120, 1, 70,function(c) 
+	FieldOfView = c
+end)
+
+local timechanger = false
+local customtime = 12
+
+smth:AddToggle('Timechanger',true,nil,function(v)
+	timechanger = v
+end)
+
+smth:AddSlider('Time', 24, 0, game.Lighting.ClockTime,function(c) 
+	customtime = c
 end)
 
 local crosshairSize = 10
@@ -323,7 +386,43 @@ smth:AddSlider('Crosshair Size', 100, 10, 1,function(c)
 	crosshairSize = c
 end)
 
+smth:AddSlider('Base Walls Transperancy', 1, 0, 0,function(c) 
+	for _, v in pairs(workspace:GetChildren()) do
+		if v:FindFirstChild("Hitbox") then
+			v.Hitbox.Transparency = c
+		end
+	end
+end)
+
+local Sky = game:GetService("Lighting"):FindFirstChildOfClass("Sky")
+if not Sky then Sky = Instance.new("Sky", Lighting) end
+local value = "Standard"
+local SkyBoxes = {
+    ["Standard"] = { ["SkyboxBk"] = Sky.SkyboxBk, ["SkyboxDn"] = Sky.SkyboxDn, ["SkyboxFt"] = Sky.SkyboxFt, ["SkyboxLf"] = Sky.SkyboxLf, ["SkyboxRt"] = Sky.SkyboxRt, ["SkyboxUp"] = Sky.SkyboxUp, },
+    ["Among Us"] = { ["SkyboxBk"] = "rbxassetid://5752463190", ["SkyboxDn"] = "rbxassetid://5752463190", ["SkyboxFt"] = "rbxassetid://5752463190", ["SkyboxLf"] = "rbxassetid://5752463190", ["SkyboxRt"] = "rbxassetid://5752463190", ["SkyboxUp"] = "rbxassetid://5752463190" },
+    ["Spongebob"] = { ["SkyboxBk"] = "rbxassetid://277099484", ["SkyboxDn"] = "rbxassetid://277099500", ["SkyboxFt"] = "rbxassetid://277099554", ["SkyboxLf"] = "rbxassetid://277099531", ["SkyboxRt"] = "rbxassetid://277099589", ["SkyboxUp"] = "rbxassetid://277101591" },
+    ["Deep Space"] = { ["SkyboxBk"] = "rbxassetid://159248188", ["SkyboxDn"] = "rbxassetid://159248183", ["SkyboxFt"] = "rbxassetid://159248187", ["SkyboxLf"] = "rbxassetid://159248173", ["SkyboxRt"] = "rbxassetid://159248192", ["SkyboxUp"] = "rbxassetid://159248176" },
+    ["Winter"] = { ["SkyboxBk"] = "rbxassetid://510645155", ["SkyboxDn"] = "rbxassetid://510645130", ["SkyboxFt"] = "rbxassetid://510645179", ["SkyboxLf"] = "rbxassetid://510645117", ["SkyboxRt"] = "rbxassetid://510645146", ["SkyboxUp"] = "rbxassetid://510645195" },
+    ["Clouded Sky"] = { ["SkyboxBk"] = "rbxassetid://252760981", ["SkyboxDn"] = "rbxassetid://252763035", ["SkyboxFt"] = "rbxassetid://252761439", ["SkyboxLf"] = "rbxassetid://252760980", ["SkyboxRt"] = "rbxassetid://252760986", ["SkyboxUp"] = "rbxassetid://252762652" },
+    --["test"] = {"SkyboxBk"="rbxassetid://","SkyboxDn"="rbxassetid://","SkyboxFt"="rbxassetid://","SkyboxLf"="rbxassetid://","SkyboxRt"="rbxassetid://","SkyboxUp"="rbxassetid://"},
+}
+smth:AddDropdown('Sky',{'Standard','Among Us','Spongebob','Deep Space','Winter','Clouded Sky'},'Standard',function(a)
+	value = a
+end)
+RunService.Heartbeat:Connect(function()
+    for i, v in pairs(SkyBoxes[value]) do
+        Sky[i] = v
+    end
+end);
+
+local Fog = false
+
+smth:AddToggle('Fog Disabled',true,nil,function(v)
+	Fog = v
+end)
+
 RunService.RenderStepped:Connect(function()
+	Camera2.FieldOfView = FieldOfView
 	if Chams == true then
 		for _, z in pairs(ChamsFolder:GetChildren()) do
 			z.Enabled = true
@@ -332,6 +431,12 @@ RunService.RenderStepped:Connect(function()
 		for _, z in pairs(ChamsFolder:GetChildren()) do
 			z.Enabled = false
 		end
+	end
+    if Fog == true then
+        game.Lighting.FogEnd = 10000
+    end
+	if timechanger == true then
+		game.Lighting.ClockTime = customtime
 	end
 end)
 
