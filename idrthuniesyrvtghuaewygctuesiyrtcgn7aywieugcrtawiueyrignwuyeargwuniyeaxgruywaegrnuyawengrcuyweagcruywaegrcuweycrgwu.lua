@@ -14,8 +14,10 @@ local LocalPlayer = Players.LocalPlayer
 local Lighting = game:GetService("Lighting")
 local Nametags = {}
 local Weapon = {}
+local CratesEsp = {}
 local Nametag = false
 local Chams = false
+local Cratetags = false
 local ChamsFolder = Instance.new("Folder")
 ChamsFolder.Parent = game.CoreGui
 ChamsFolder.Name = "ChamsFolder"
@@ -42,6 +44,17 @@ local function createWeapon(player)
     Weapon[player] = text
 end
 
+local function createCrateEsp(Crate)
+    local text = Drawing.new("Text")
+    text.Visible = false
+    text.Center = true
+    text.Outline = true
+    text.Size = 20
+    text.Color = Color3.new(0, 255, 0)
+
+    CratesEsp[Crate] = text
+end
+
 local function removeNametag(player)
     if Nametags[player] then
         Nametags[player]:Remove()
@@ -53,6 +66,13 @@ local function removeWeapon(player)
     if Weapon[player] then
         Weapon[player]:Remove()
         Weapon[player] = nil
+    end
+end
+
+local function removeCrateEsp(Crate)
+    if CratesEsp[Crate] then
+        CratesEsp[Crate]:Remove()
+        CratesEsp[Crate] = nil
     end
 end
 
@@ -90,6 +110,55 @@ game.Workspace.DescendantRemoving:Connect(function(player)
 	if player:FindFirstChild("HumanoidRootPart") then
 		removeWeapon(player)
 	end
+end)
+
+for _, Crate in pairs(workspace:GetChildren()) do
+	if Crate:FindFirstChild("Bottom") and Crate:FindFirstChild("Handles") and Crate:FindFirstChild("Top") then
+        createCrateEsp(Crate)
+    end
+end
+
+game.Workspace.DescendantAdded:Connect(function(Crate)
+	if Crate:FindFirstChild("Bottom") and Crate:FindFirstChild("Handles") and Crate:FindFirstChild("Top") then
+		createCrateEsp(Crate)
+	end
+end)
+
+game.Workspace.DescendantRemoving:Connect(function(Crate)
+	if Crate:FindFirstChild("Bottom") and Crate:FindFirstChild("Handles") and Crate:FindFirstChild("Top") then
+		removeCrateEsp(Crate)
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+    for Crate, text in pairs(Crate) do
+       	local character = Crate
+        if character then
+            local rootPart = character:FindFirstChild("Bottom") and character:FindFirstChild("Handles") and character:FindFirstChild("Top")
+            if rootPart then
+                local screenPosition, onScreen = Camera:WorldToViewportPoint(rootPart.Position + Vector3.new(0, -3.3, 0))
+                local humanoidRootPart = Crate:FindFirstChild("Bottom")
+                local distance2 = math.floor((Camera.CFrame.Position - humanoidRootPart.Position).magnitude)
+                local distance = (Camera.CFrame.Position - rootPart.Position).Magnitude
+                if onScreen then
+                    text.Position = Vector2.new(screenPosition.X, screenPosition.Y)
+                    text.Text = "Green Crate [" .. distance2 .. "m]"
+                    text.Size = math.clamp(30 - distance, 12, 20)
+					if Cratetags == true then
+						text.Visible = true
+					elseif Cratetags == false then
+						text.Visible = false
+					end
+                else
+                    text.Visible = false
+                end
+            else
+                text.Visible = false
+            end
+        else
+            text.Visible = false
+        end
+    end
 end)
 
 RunService.RenderStepped:Connect(function()
@@ -197,6 +266,10 @@ end)
 
 esp:AddToggle('Chams',true,nil,function(v) 
 	Chams = v
+end)
+
+esp:AddToggle('Green Crate',true,nil,function(v) 
+	Cratetags = v
 end)
 
 local FieldOfView = 70
