@@ -220,18 +220,55 @@ smth:AddSlider('Time', 24, 0, game.Lighting.ClockTime,function(c)
 	customtime = c
 end)
 
-local dot = Drawing.new("Square", {
-	Visible = true,
-	Size = Vector2.new(2, 2),
-	Filled = true,
-	ZIndex = 2,
-	Transparency = 1,
-	Position = Vector3.new(0, 3, 0),
-	Color = Color3.fromRGB(255, 0, 0)
-})
+local crosshairSize = 10
+local Crosshair = true
+local crosshairThickness = 1
+local crosshairColor = Color3.fromRGB(255, 0, 0)
+local lines = {}
+
+for i = 1, 4 do
+    local line = Drawing.new("Line")
+    line.Color = crosshairColor
+    line.Thickness = crosshairThickness
+    line.Transparency = 1
+    line.Visible = true
+    lines[i] = line
+end
+local function updateCrosshair()
+    local centerX = Camera.ViewportSize.X / 2
+    local centerY = Camera.ViewportSize.Y / 2
+
+	lines[1].Thickness = crosshairThickness
+	lines[2].Thickness = crosshairThickness
+	lines[3].Thickness = crosshairThickness
+	lines[4].Thickness = crosshairThickness
+
+	lines[1].Visible = Crosshair
+	lines[2].Visible = Crosshair
+	lines[3].Visible = Crosshair
+	lines[4].Visible = Crosshair
+
+    lines[1].From = Vector2.new(centerX, centerY)
+    lines[1].To = Vector2.new(centerX, centerY - crosshairSize)
+    lines[2].From = Vector2.new(centerX, centerY)
+    lines[2].To = Vector2.new(centerX, centerY + crosshairSize)
+    lines[3].From = Vector2.new(centerX, centerY)
+    lines[3].To = Vector2.new(centerX - crosshairSize, centerY)
+    lines[4].From = Vector2.new(centerX, centerY)
+    lines[4].To = Vector2.new(centerX + crosshairSize, centerY)
+end
+RunService.RenderStepped:Connect(updateCrosshair)
 
 smth:AddToggle('Crosshair',true,nil,function(v)
-	dot.Visible = v
+	Crosshair = v
+end)
+
+smth:AddSlider('Crosshair Thickness', 10, 1, 1,function(c)
+	crosshairThickness = c
+end)
+
+smth:AddSlider('Crosshair Size', 100, 10, 1,function(c)
+	crosshairSize = c
 end)
 
 smth:AddSlider('Base Walls Transperancy', 1, 0, 0,function(c) 
