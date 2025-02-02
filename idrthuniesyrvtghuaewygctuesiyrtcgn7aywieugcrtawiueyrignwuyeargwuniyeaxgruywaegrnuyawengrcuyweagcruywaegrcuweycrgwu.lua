@@ -19,7 +19,7 @@ local Nametag = false
 local Chams = false
 local Cratetags = false
 local ChamsFolder = Instance.new("Folder")
-ChamsFolder.Parent = game.CoreGui
+ChamsFolder.Parent = game.TestService
 ChamsFolder.Name = "ChamsFolder"
 
 local function createNametag(player)
